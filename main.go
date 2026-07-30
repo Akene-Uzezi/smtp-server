@@ -1,5 +1,10 @@
 package main
 
+import "net"
+
 func main() {
-	println("Hello main!")
+	addr := ":2525"
+	listner, err := net.Listen("tcp", addr)
+	if err != nil {
+	}
 }
