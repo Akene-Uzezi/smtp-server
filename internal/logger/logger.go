@@ -10,6 +10,7 @@ import (
 var (
 	ErrorFileLogger   *log.Logger
 	SuccessFileLogger *log.Logger
+	EmailLogger       *log.Logger
 )
 
 // InitLogger creates the log directory creates the files and hands them to their respective loggers
@@ -31,4 +32,11 @@ func InitLogger() {
 		log.Fatalf("failed to open error log file: %v", err)
 	}
 	SuccessFileLogger = log.New(successFile, "Success: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+	emailFilePath := filepath.Join(logDir, "emailLogger.log")
+	emailFile, err := os.OpenFile(emailFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
+	if err != nil {
+		log.Fatalf("failed to open email file: %v", err)
+	}
+	EmailLogger = log.New(emailFile, "Email: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
