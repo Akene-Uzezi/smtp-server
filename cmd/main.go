@@ -64,7 +64,16 @@ func handleClient(conn net.Conn) {
 			rawData.WriteString(line + "\r\n")
 			continue
 		}
+
+		parts := strings.SplitN(line, " ", 2)
+		cmd := strings.ToUpper(parts[0])
+
+		switch cmd {
+		default:
+			conn.Write([]byte("500 5.5.1 command unrecognized\r\n"))
+			return
+		}
 	}
 }
 
-func saveAndPrintEmail(from string, rcpt []string, rawData string) {}
+func saveAndPrintEmail(from string, rcpt []string, rawData any) {}
