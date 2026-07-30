@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"smtp-server/internal/logger"
 )
@@ -33,4 +35,36 @@ func main() {
 }
 
 // handleClient([net.Conn]) handlesEvery client
-func handleClient(conn net.Conn) {}
+func handleClient(conn net.Conn) {
+	defer conn.Close()
+	reader := bufio.NewReader(conn)
+	conn.Write([]byte("220 whatever.com smtp Server Ready\r\n"))
+
+	var (
+		from    string
+		rcpt    []string
+		rawData strings.Builder
+	)
+	inDataMode := false
+
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			logger.ErrorFileLogger.Printf("Error reading string: %v", err)
+			return
+		}
+		line = strings.TrimRight(line, "\r\n")
+		if inDataMode {
+			if line == "." {
+				inDataMode = false
+				conn.Write([]byte("message accepted for delivery\r\n"))
+				saveAndPrintEmail(from, rcpt, rawData)
+				continue
+			}
+			rawData.WriteString(line + "\r\n")
+			continue
+		}
+	}
+}
+
+func saveAndPrintEmail(from string, rcpt []string, rawData string) {}
